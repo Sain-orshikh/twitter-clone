@@ -44,6 +44,7 @@ const SignUpPage = () => {
 		},
 		onSuccess: () => {
 			toast.success("Account created successfully (reload to continue)");
+			queryClient.invalidateQueries({queryKey:["authUser"]});
 		},
 	});
 
