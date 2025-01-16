@@ -1,35 +1,86 @@
 import { Link } from "react-router-dom";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
+import {useQuery, useMutation, useQueryClient} from "@tanstack/react-query";
+import {toast} from "react-hot-toast";
 
 import { IoSettingsOutline } from "react-icons/io5";
-import { FaUser } from "react-icons/fa";
+import { FaTrash, FaUser } from "react-icons/fa";
 import { FaHeart } from "react-icons/fa6";
 
 const NotificationPage = () => {
-	const isLoading = false;
-	const notifications = [
-		{
-			_id: "1",
-			from: {
-				_id: "1",
-				username: "johndoe",
-				profileImg: "/avatars/boy2.png",
-			},
-			type: "follow",
+
+	const queryClient = useQueryClient();
+
+	const { data: notifications, isLoading } = useQuery({queryKey: ["notifications"],
+		queryFn: async () => {
+			try {
+				const res = await fetch('/api/notifications');
+				const data = await res.json();
+				if(!res.ok){
+					throw new Error(data.error || "Something went wrong");
+				} 
+				return data;
+			} catch (error) {
+				throw new Error(error);
+			}
+		}
+	});
+
+	const {mutate: deleteNotificationsMutation} = useMutation({
+		mutationFn: async () => {
+			try {
+				const res = await fetch('/api/notifications',{
+					method: 'DELETE',
+				})
+				const data = await res.json();
+				if(!res.ok){
+					throw new Error(data.error || "Something went wrong");
+				}
+				return data;
+			} catch (error) {
+				throw new Error(error);
+			}
 		},
-		{
-			_id: "2",
-			from: {
-				_id: "2",
-				username: "janedoe",
-				profileImg: "/avatars/girl1.png",
-			},
-			type: "like",
+		onError: (error) => {
+			toast.error(error.message);
 		},
-	];
+		onSuccess: () => {
+			toast.success("Notifications deleted successfully");
+			queryClient.invalidateQueries({queryKey: ["notifications"]});
+		},
+	});
 
 	const deleteNotifications = () => {
-		alert("All notifications deleted");
+		if(isDeleting) return;
+		deleteNotificationsMutation();
+	};
+
+	const {mutate: deleteNotificationMutation, isPending: isDeleting} = useMutation({
+		mutationFn: async (notificationId) => {
+			try {
+				const res = await fetch(`/api/notifications/${notificationId}`,{
+					method: 'DELETE',
+				})
+				const data = await res.json();
+				if(!res.ok){
+					throw new Error(data.error || "Something went wrong");
+				}
+				return data;
+			} catch (error) {
+				throw new Error(error);
+			}
+		},
+		onError: (error) => {
+			toast.error(error.message);
+		},
+		onSuccess: () => {
+			toast.success("Notification deleted successfully");
+			queryClient.invalidateQueries({queryKey: ["notifications"]});
+		},
+	});
+
+	const handleDeleteNotification = async (notificationId) => {
+		deleteNotificationMutation(notificationId);
 	};
 
 	return (
@@ -58,7 +109,7 @@ const NotificationPage = () => {
 				)}
 				{notifications?.length === 0 && <div className='text-center p-4 font-bold'>No notifications 🤔</div>}
 				{notifications?.map((notification) => (
-					<div className='border-b border-gray-700' key={notification._id}>
+					<div className='flex flex-row border-b border-gray-700' key={notification._id}>
 						<div className='flex gap-2 p-4'>
 							{notification.type === "follow" && <FaUser className='w-7 h-7 text-primary' />}
 							{notification.type === "like" && <FaHeart className='w-7 h-7 text-red-500' />}
@@ -73,6 +124,12 @@ const NotificationPage = () => {
 									{notification.type === "follow" ? "followed you" : "liked your post"}
 								</div>
 							</Link>
+						</div>
+						<div className="ml-auto my-auto mr-5">
+							<button className="hover:text-red-500" onClick={() => handleDeleteNotification(notification._id)}>
+								{!isDeleting && <FaTrash fontSize={20}/>}
+								{isDeleting && <LoadingSpinner size='md'/>}
+							</button>
 						</div>
 					</div>
 				))}
