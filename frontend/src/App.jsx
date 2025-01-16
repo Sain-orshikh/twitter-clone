@@ -5,6 +5,7 @@ import LoginPage from "./pages/auth/login/LoginPage"
 import SingUpPage from "./pages/auth/signup/SignUpPage"
 import NotificationPage from "./pages/notification/NotificationPage"
 import ProfilePage from "./pages/profile/ProfilePage"
+import ExplorePage from "./pages/explore/ExplorePage"
 
 import Sidebar from "./components/common/Sidebar"
 import RightPanel from "./components/common/RightPanel"
@@ -51,6 +52,7 @@ function App() {
           <Route path="/signup" element={!authUser ? <SingUpPage /> : <Navigate to={"/"}/>} />
           <Route path="/notifications" element={authUser ? <NotificationPage /> : <Navigate to={"/login"}/>} />
           <Route path="/profile/:username" element={authUser ? <ProfilePage /> : <Navigate to={"/login"}/>} />
+          <Route path="/explore" element={authUser ? <ExplorePage/> : <Navigate to={"/login"}/>} />
         </Routes>
         {authUser && <RightPanel />}
         <Toaster/>

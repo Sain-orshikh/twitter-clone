@@ -47,6 +47,8 @@ const ProfilePage = () => {
 		},
 	});
 
+	const {data: posts} = useQuery({queryKey: ["posts"]});
+
 	const isMyProfile = authUser._id === user?._id;
 
 	const handleImgChange = (e, state) => {
@@ -120,7 +122,7 @@ const ProfilePage = () => {
 								</Link>
 								<div className='flex flex-col'>
 									<p className='font-bold text-lg'>{user?.fullName}</p>
-									<span className='text-sm text-slate-500'>{POSTS?.length} posts</span>
+									<span className='text-sm text-slate-500'>{posts?.length} posts</span>
 								</div>
 							</div>
 							{/* COVER IMG */}

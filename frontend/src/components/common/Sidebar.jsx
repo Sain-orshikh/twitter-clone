@@ -5,6 +5,7 @@ import { IoNotifications } from "react-icons/io5";
 import { FaUser } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { BiLogOut } from "react-icons/bi";
+import { IoSearch } from "react-icons/io5";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 
 
@@ -74,6 +75,15 @@ const Sidebar = () => {
 						>
 							<FaUser className='w-6 h-6' />
 							<span className='text-lg hidden md:block'>Profile</span>
+						</Link>
+					</li>
+
+					<li>
+						<Link
+							to={'/explore'}
+							className='flex mx-auto items-center hover:bg-stone-900 transition-all rounded-full duration-300 py-2 pl-2 pr-4 max-w-fit cursor-pointer'
+						>
+							<IoSearch className='w-7 h-7 block md:hidden text-gray'/>
 						</Link>
 					</li>
 				</ul>
